@@ -5,6 +5,7 @@ import connectDb from "./config/db.js";
 import userRoute from "./routes/userRoutes.js";
 import cookieParser from "cookie-parser";
 import { notFound, errorHandler } from "./middlewares/errorMiddlewares.js";
+import productRoute from "./routes/productRoutes.js";
 
 dotenv.config();
 
@@ -20,8 +21,9 @@ app.use(cors());
 const port = process.env.PORT;
 
 app.use("/api/user", userRoute);
+app.use("/api/products", productRoute);
 
-app.use(notFound)
-app.use(errorHandler)
+app.use(notFound);
+app.use(errorHandler);
 
 app.listen(port, () => console.log("server started successfully"));
