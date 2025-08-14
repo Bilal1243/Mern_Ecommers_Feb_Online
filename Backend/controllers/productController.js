@@ -2,7 +2,36 @@ import Products from "../models/productModel.js";
 import Users from "../models/userModel.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 
-const getProducts = asyncHandler(async (req, res) => {});
+// This controller function fetches a list of products with pagination and search support
+const getProducts = asyncHandler(async (req, res) => {
+  // Set the number of products to display per page (pagination size)
+  const pageSize = 4;
+
+  // Get the page number from the query string (e.g., ?pageNumber=2), default is 1
+  const page = Number(req.query.pageNumber) || 1;
+
+  // If there's a keyword in the query string (e.g., ?keyword=shirt), create a search condition
+  // It will match the product name using regular expression (case-insensitive)
+  const keywordCondition = req.query.keyword
+    ? { name: { $regex: req.query.keyword, $options: "i" } }
+    : {}; // If no keyword, match all products
+
+  // Count how many products match the search condition
+  const count = await Products.countDocuments({ ...keywordCondition });
+
+  // Fetch products from the database that match the keywordCondition
+  // Apply pagination using limit and skip
+  const products = await Products.find({ ...keywordCondition })
+    .limit(pageSize) // Limit the number of products per page
+    .skip(pageSize * (page - 1)); // Skip products from previous pages
+
+  // Send the result back as JSON
+  res.json({
+    products, // The list of products for the current page
+    page, // Current page number
+    pages: Math.ceil(count / pageSize), // Total number of pages
+  });
+});
 
 const getProductById = asyncHandler(async (req, res) => {
   let product = await Products.findById(req.params.id);
@@ -42,7 +71,6 @@ const updateProduct = asyncHandler(async (req, res) => {
   let product = await Products.findById(req.params.id);
 
   if (product) {
-
     product.name = name || product.name;
     product.price = price || product.price;
     product.category = category || product.category;
@@ -51,27 +79,30 @@ const updateProduct = asyncHandler(async (req, res) => {
     product.description = description || product.description;
     product.image = req.file ? req.file.path : product.image;
 
-    const productUpdate = await product.save()
+    const productUpdate = await product.save();
 
-    res.json(productUpdate)
-
-  }else{
-    req.status(404)
-    throw new Error('Product Not Found')
+    res.json(productUpdate);
+  } else {
+    req.status(404);
+    throw new Error("Product Not Found");
   }
 });
 
 const deleteProduct = asyncHandler(async (req, res) => {
-  let product = await Products.findById(req.params.id)
+  let product = await Products.findById(req.params.id);
 
-  if(product){
-    await Products.deleteOne({_id : product._id})
-    res.json({message : 'product removed'})
-  }else{
-    res.status(404)
-    throw new Error('Product Not Found')
+  if (product) {
+    await Products.deleteOne({ _id: product._id });
+    res.json({ message: "product removed" });
+  } else {
+    res.status(404);
+    throw new Error("Product Not Found");
   }
+});
 
+const getAllProducts = asyncHandler(async (req, res) => {
+  const products = await Products.find();
+  res.json(products);
 });
 
 export {
@@ -80,4 +111,5 @@ export {
   createProduct,
   updateProduct,
   deleteProduct,
+  getAllProducts,
 };

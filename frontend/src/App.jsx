@@ -6,8 +6,9 @@ import LoginScreen from "./screens/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import Header from "./components/Header";
 import { Container } from "react-bootstrap";
-import ToastContainer from "react-bootstrap";
+import {ToastContainer} from "react-toastify";
 import ProductListScreen from "./screens/Admin/ProductListScreen";
+import ProductAddScreen from "./screens/Admin/ProductAddScreen";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
 
 
             <Route path="/admin/productlist" element={<ProductListScreen/>}/>
+            <Route path="/admin/addProduct" element={<ProductAddScreen/>}/>
 
 
 

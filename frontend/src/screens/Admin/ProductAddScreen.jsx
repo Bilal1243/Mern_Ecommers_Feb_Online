@@ -49,7 +49,7 @@ const ProductAddScreen = () => {
         Go Back
       </Link>
       <FormContainer>
-        <h1>Edit Product</h1>
+        <h1>Add Product</h1>
         {isLoading ? (
           <Loader />
         ) : error ? (

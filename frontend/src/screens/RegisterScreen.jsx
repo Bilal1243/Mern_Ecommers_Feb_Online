@@ -2,45 +2,44 @@ import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import FormContainer from "../components/FormContainer";
 import { Form, Button, Row, Col } from "react-bootstrap";
-import { useDispatch , useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Loader from "../components/Loader";
-import {useRegisterUserMutation} from '../slices/userApiSlice'
+import { useRegisterUserMutation } from "../slices/userApiSlice";
 
 const RegisterScreen = () => {
-
-  const {userInfo} = useSelector((state=>state.auth))
+  const { userInfo } = useSelector((state) => state.auth);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const [userRegister] = useRegisterUserMutation()
+  const [userRegister] = useRegisterUserMutation();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  let isLoading = false
+  let isLoading = false;
 
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
-      if(password !== confirmPassword){
-        alert('Password must be same')
-        return
+      if (password !== confirmPassword) {
+        alert("Password must be same");
+        return;
       }
-      let res = await userRegister({name,email,password}).unwrap()
-      navigate('/login')
+      let res = await userRegister({ name, email, password }).unwrap();
+      navigate("/login");
     } catch (error) {
-      console.log(error?.data?.message || error?.message)
+      console.log(error?.data?.message || error?.message);
     }
   };
 
-  useEffect(()=>{
-    if(userInfo){
-      navigate('/')
+  useEffect(() => {
+    if (userInfo) {
+      navigate("/");
     }
-  },[userInfo])
+  }, [userInfo]);
 
   return (
     <FormContainer>

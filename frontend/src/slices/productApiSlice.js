@@ -27,6 +27,17 @@ const productApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    getAllProducts: builder.query({
+      query: () => ({
+        url: "/api/products/getAllProducts",
+      }),
+    }),
+    getProducts: builder.query({
+      query: ({ pageNumber, keyword } = {}) => ({
+        url: "/api/products",
+        params: { pageNumber, keyword },
+      }),
+    }),
   }),
 });
 
@@ -35,4 +46,6 @@ export const {
   useDeleteProductMutation,
   useGetProductByIdQuery,
   useUpdateProductMutation,
+  useGetAllProductsQuery,
+  useGetProductsQuery
 } = productApiSlice;
