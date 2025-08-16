@@ -1,17 +1,35 @@
-import {Row , Col , Button ,Table} from 'react-bootstrap'
-import  {FaPlus , FaEdit , FaTrash} from 'react-icons/fa'
-import Loader from '../../components/Loader';
-import Message from '../../components/Message';
-import { useNavigate } from 'react-router-dom';
-import { useGetAllProductsQuery } from '../../slices/productApiSlice';
-
+import { Row, Col, Button, Table } from "react-bootstrap";
+import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import Loader from "../../components/Loader";
+import Message from "../../components/Message";
+import { useNavigate } from "react-router-dom";
+import {
+  useGetAllProductsQuery,
+  useDeleteProductMutation,
+} from "../../slices/productApiSlice";
+import { toast } from "react-toastify";
 
 const ProductListScreen = () => {
+  const {
+    data: products,
+    isLoading,
+    error,
+    refetch,
+  } = useGetAllProductsQuery();
 
-  const {data : products , isLoading , error} = useGetAllProductsQuery()
+  const [deleteProduct] = useDeleteProductMutation();
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
+  const deleteHandler = async (productId) => {
+    try {
+      await deleteProduct(productId).unwrap();
+      toast.success("Product Deleted");
+      refetch();
+    } catch (error) {
+      toast.error(error?.data?.message || error?.message);
+    }
+  };
 
   return (
     <>
@@ -20,7 +38,10 @@ const ProductListScreen = () => {
           <h1>Products</h1>
         </Col>
         <Col className="text-end">
-          <Button className="btn-sm m-3"onClick={()=>navigate('/admin/addProduct')}>
+          <Button
+            className="btn-sm m-3"
+            onClick={() => navigate("/admin/addProduct")}
+          >
             <FaPlus /> Create Product
           </Button>
         </Col>
@@ -74,5 +95,4 @@ const ProductListScreen = () => {
   );
 };
 
-
-export default ProductListScreen
+export default ProductListScreen;
