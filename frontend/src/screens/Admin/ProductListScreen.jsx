@@ -72,7 +72,7 @@ const ProductListScreen = () => {
                   <td>{product.category}</td>
                   <td>{product.brand}</td>
                   <td>
-                    <Button variant="light" className="btn-sm mx-2">
+                    <Button variant="light" className="btn-sm mx-2" onClick={()=>navigate(`/admin/edit/${product._id}`)}>
                       <FaEdit />
                     </Button>
 

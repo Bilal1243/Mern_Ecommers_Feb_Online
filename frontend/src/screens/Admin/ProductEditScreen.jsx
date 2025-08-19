@@ -1,9 +1,15 @@
-import {useState,useEffect} from 'react'
-import {Form,Button} from 'react-bootstrap'
-import FormContainer from '../../components/FormContainer'
-import Loader from '../../components/Loader';
-import Message from '../../components/Message';
-import { Link,useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { Form, Button } from "react-bootstrap";
+import FormContainer from "../../components/FormContainer";
+import Loader from "../../components/Loader";
+import Message from "../../components/Message";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import {
+  useGetProductByIdQuery,
+  useUpdateProductMutation,
+  useGetAllProductsQuery,
+} from "../../slices/productApiSlice";
 
 const ProductEditScreen = () => {
   const { id: productId } = useParams();
@@ -16,21 +22,55 @@ const ProductEditScreen = () => {
   const [countInStock, setCountInStock] = useState(0);
   const [description, setDescription] = useState("");
 
+  const { data, refetch: getAllProducts } = useGetAllProductsQuery();
+
+  let {
+    data: product,
+    isLoading,
+    error,
+    refetch,
+  } = useGetProductByIdQuery(productId);
+
+  const [updateProduct, { isLoading: loadingUpdate }] =
+    useUpdateProductMutation();
+
+  const navigate = useNavigate();
+
   const submitHandler = async (e) => {
     e.preventDefault();
+    try {
+      let data = new FormData();
+
+      data.append("name", name);
+      data.append("price", price);
+      data.append("brand", brand);
+      data.append("category", category);
+      data.append("countInStock", countInStock);
+      data.append("description", description);
+      if (image) data.append("image", image);
+
+      await updateProduct({ productId, data }).unwrap();
+
+      toast.success("Product Updated");
+      refetch();
+      getAllProducts();
+      navigate("/admin/productlist");
+    } catch (error) {
+      toast.error(error?.data?.message || error?.message);
+    }
   };
 
   useEffect(() => {
     if (product) {
       setName(product.name);
       setPrice(product.price);
-      setImage(product.image);
       setBrand(product.brand);
       setCategory(product.category);
       setCountInStock(product.countInStock);
       setDescription(product.description);
     }
   }, [product]);
+
   return (
     <>
       <Link to="/admin/productlist" className="btn btn-light my-3">
@@ -38,7 +78,6 @@ const ProductEditScreen = () => {
       </Link>
       <FormContainer>
         <h1>Edit Product</h1>
-        {loadingUpdate && <Loader />}
         {isLoading ? (
           <Loader />
         ) : error ? (
@@ -63,21 +102,16 @@ const ProductEditScreen = () => {
                 onChange={(e) => setPrice(e.target.value)}
               ></Form.Control>
             </Form.Group>
-            {/* <Form.Group controlId="image">
+            <Form.Group controlId="image">
               <Form.Label>Image</Form.Label>
               <Form.Control
-                type="text"
-                placeholder="Enter image url"
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-              ></Form.Control>
-              <Form.Control
                 label="Choose File"
-                onChange={uploadFileHandler}
+                onChange={(e) => {
+                  setImage(e.target.files[0]);
+                }}
                 type="file"
               ></Form.Control>
-              {loadingUpload && <Loader />}
-            </Form.Group> */}
+            </Form.Group>
             <Form.Group controlId="brand">
               <Form.Label>Brand</Form.Label>
               <Form.Control
@@ -118,8 +152,9 @@ const ProductEditScreen = () => {
               type="submit"
               variant="primary"
               style={{ marginTop: "1rem" }}
+              disabled={loadingUpdate}
             >
-              Update
+              {loadingUpdate ? "update in process..." : "Update"}
             </Button>
           </Form>
         )}
@@ -128,6 +163,4 @@ const ProductEditScreen = () => {
   );
 };
 
-
-
-export default ProductEditScreen
+export default ProductEditScreen;
