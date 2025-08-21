@@ -1,5 +1,6 @@
-import {Card} from 'react-bootstrap'
-import { Link } from 'react-router-dom';
+import { Card } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import Rating from "./Rating";
 
 const Product = ({ product }) => {
   return (
@@ -13,11 +14,13 @@ const Product = ({ product }) => {
             <strong>{product.name}</strong>
           </Card.Title>
         </Link>
+        <Card.Title as="div" className="product-title">
+          <Rating value={product.rating} />
+        </Card.Title>{" "}
         <Card.Text as="h3">${product.price}</Card.Text>
       </Card.Body>
     </Card>
   );
 };
 
-
-export default Product
+export default Product;

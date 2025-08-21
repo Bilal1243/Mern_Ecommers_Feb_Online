@@ -10,6 +10,7 @@ import {
   getProducts,
   getProductById,
   getAllProducts,
+  createProductReview,
 } from "../controllers/productController.js";
 import { productParser } from "../config/uploads.js";
 
@@ -26,5 +27,7 @@ productRoute
   .get(getProductById)
   .put(protect, admin, productParser.single("image"), updateProduct)
   .delete(protect, admin, deleteProduct);
+
+productRoute.route('/:id/review').post(protect,createProductReview)
 
 export default productRoute;
