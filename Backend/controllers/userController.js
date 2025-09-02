@@ -60,4 +60,77 @@ const logoutUser = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "logout success" });
 });
 
-export { registerUser, loginUser, logoutUser };
+// to get all users
+// only for admin
+const getUsers = asyncHandler(async (req, res) => {
+  const users = await Users.find();
+  res.json(users);
+});
+
+// to delete a user
+// only for admin
+const deleteUser = asyncHandler(async (req, res) => {
+  const user = await Users.findById(req.params.id);
+
+  if (user) {
+    if (user.isAdmin) {
+      res.status(400);
+      throw new Error("can not delete admin");
+    }
+
+    await Users.deleteOne({ _id: user._id });
+
+    res.json({ message: "user removed" });
+  } else {
+    res.status(404);
+    throw new Error("user not found");
+  }
+});
+
+// to get a user by id
+// only for admin
+const getUserById = asyncHandler(async (req, res) => {
+  const user = await Users.findById(req.params.id);
+
+  if (user) {
+    res.json(user);
+  } else {
+    res.status(404);
+    throw new Error("user not found");
+  }
+});
+
+// only for admin
+const updateUser = asyncHandler(async (req, res) => {
+  const { name, email, isAdmin } = req.body;
+
+  const user = await Users.findById(req.params.id);
+
+  if (user) {
+    user.name = name || user.name;
+    user.email = email || user.email;
+    user.isAdmin = Boolean(isAdmin) || user.isAdmin;
+
+    const updatedUser = await user.save();
+
+    res.json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      isAdmin: updatedUser.isAdmin,
+    });
+  } else {
+    res.status(404);
+    throw new Error("user not found");
+  }
+});
+
+export {
+  registerUser,
+  loginUser,
+  logoutUser,
+  getUsers,
+  deleteUser,
+  getUserById,
+  updateUser,
+};
