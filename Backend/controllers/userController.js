@@ -52,7 +52,7 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
-  res.cookie("jwt", "", {
+  res.cookie('jwt', "", {
     httpOnly: true,
     expiresIn: new Date(0),
   });
