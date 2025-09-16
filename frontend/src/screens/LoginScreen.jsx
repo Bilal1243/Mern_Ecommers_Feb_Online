@@ -5,6 +5,7 @@ import FormContainer from "../components/FormContainer";
 import { useLoginUserMutation } from "../slices/userApiSlice";
 import { useDispatch, useSelector } from 'react-redux'
 import { setCredentails } from '../slices/authSlice'
+import { toast } from "react-toastify";
 
 function LoginScreen() {
 
@@ -26,6 +27,7 @@ function LoginScreen() {
       navigate('/')
     } catch (error) {
       console.log(error?.data?.message || error?.message)
+      toast.error(error?.data?.message || error?.message)
     }
   };
 

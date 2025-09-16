@@ -2,29 +2,29 @@ import React from "react";
 import { Navbar, Container, Nav, NavDropdown, Badge } from "react-bootstrap";
 import { FaShoppingCart, FaUser } from "react-icons/fa";
 import { useNavigate, Link } from "react-router-dom";
-import { useSelector ,useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useLogoutUserMutation } from "../slices/userApiSlice";
 import { logout } from "../slices/authSlice";
 import { toast } from "react-toastify";
 
 function Header() {
   const { userInfo } = useSelector((state) => state.auth);
+  const { cartItems } = useSelector((state) => state.cart);
 
-  const [logoutUser]= useLogoutUserMutation()
+  const [logoutUser] = useLogoutUserMutation();
 
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-
-  const logoutUserHandler = async()=>{
+  const logoutUserHandler = async () => {
     try {
-      await logoutUser().unwrap()
-      dispatch(logout())
-      navigate('/')
+      await logoutUser().unwrap();
+      dispatch(logout());
+      navigate("/");
     } catch (error) {
-      toast.error(error?.message || error?.data?.message)
+      toast.error(error?.message || error?.data?.message);
     }
-  }
+  };
 
   return (
     <>
@@ -38,6 +38,18 @@ function Header() {
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="ms-auto">
+                <Nav.Link as={Link} to={"/cart"}>
+                  <FaShoppingCart /> Cart
+                  {cartItems.length > 0 && (
+                    <Badge pill bg="success" style={{ marginLeft: "5px" }}>
+                      {cartItems.reduce(
+                        (acc, item) => acc + Number(item.qty),
+                        0
+                      )}
+                    </Badge>
+                  )}
+                </Nav.Link>
+
                 {userInfo ? (
                   <>
                     <NavDropdown title={userInfo.name} id="username">
@@ -45,7 +57,9 @@ function Header() {
                         Profile
                       </NavDropdown.Item>
 
-                      <NavDropdown.Item onClick={logoutUserHandler}>logout</NavDropdown.Item>
+                      <NavDropdown.Item onClick={logoutUserHandler}>
+                        logout
+                      </NavDropdown.Item>
                     </NavDropdown>
                   </>
                 ) : (

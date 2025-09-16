@@ -13,6 +13,7 @@ import ProductEditScreen from "./screens/Admin/ProductEditScreen";
 import ProductScreen from "./screens/ProductScreen";
 import UserListScreen from "./screens/Admin/UserListScreen";
 import UserEditScreen from "./screens/Admin/UserEditScreen";
+import CartScreen from "./screens/CartScreen";
 
 function App() {
   return (
@@ -26,6 +27,8 @@ function App() {
             <Route path="/register" element={<RegisterScreen />} />
 
             <Route path="/product/:id" element={<ProductScreen/>}/>
+
+            <Route path="/cart" element={<CartScreen/>}/>
 
 
 
