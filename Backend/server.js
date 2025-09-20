@@ -6,6 +6,7 @@ import userRoute from "./routes/userRoutes.js";
 import cookieParser from "cookie-parser";
 import { notFound, errorHandler } from "./middlewares/errorMiddlewares.js";
 import productRoute from "./routes/productRoutes.js";
+import orderRoute from "./routes/orderRoutes.js";
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ const port = process.env.PORT;
 
 app.use("/api/user", userRoute);
 app.use("/api/products", productRoute);
+app.use("/api/orders", orderRoute);
 
 app.use(notFound);
 app.use(errorHandler);
