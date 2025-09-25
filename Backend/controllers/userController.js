@@ -52,7 +52,7 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
-  res.cookie('jwt', "", {
+  res.cookie("jwt", "", {
     httpOnly: true,
     expiresIn: new Date(0),
   });
@@ -125,6 +125,36 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 });
 
+const updateUserProfile = asyncHandler(async (req, res) => {
+  const { name, email, password } = req.body;
+
+  const user = await Users.findById(req.user._id);
+
+  if (user) {
+    user.name = name || user.name;
+    user.email = email || user.email;
+
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      const encryptedPassword = await bcrypt.hash(password, salt);
+
+      user.password = encryptedPassword;
+    }
+
+    const newUser = await user.save();
+
+    res.json({
+      _id: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+      isAdmin: newUser.isAdmin,
+    });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
+});
+
 export {
   registerUser,
   loginUser,
@@ -133,4 +163,5 @@ export {
   deleteUser,
   getUserById,
   updateUser,
+  updateUserProfile
 };

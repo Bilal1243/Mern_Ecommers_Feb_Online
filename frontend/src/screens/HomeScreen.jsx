@@ -1,19 +1,25 @@
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate ,useParams} from "react-router-dom";
 import Product from "../components/Product";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
 import { useGetProductsQuery } from "../slices/productApiSlice";
 import { Col, Row } from "react-bootstrap";
+import Paginate from "../components/Paginate";
 
 function HomeScreen() {
   const { userInfo } = useSelector((state) => state.auth);
 
-  let { data: products, isLoading, error } = useGetProductsQuery();
+  const { pageNumber, keyword } = useParams();
+
+  let {
+    data: products,
+    isLoading,
+    error,
+  } = useGetProductsQuery({ pageNumber, keyword });
 
   const navigate = useNavigate();
-
 
   return (
     <>
@@ -31,6 +37,7 @@ function HomeScreen() {
               </Col>
             ))}
           </Row>
+           <Paginate pages={products?.pages} page={products?.page} />
         </>
       )}
     </>

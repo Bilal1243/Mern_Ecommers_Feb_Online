@@ -5,16 +5,58 @@ import Message from "../components/Message";
 import { useNavigate, Link } from "react-router-dom";
 import CheckoutSteps from "../components/CheckoutSteps";
 import { clearCartItems } from "../slices/cartSlice";
+import {
+  useCreateOrderMutation,
+  usePayOrderMutation,
+} from "../slices/orderApiSlice";
+import Loader from "../components/Loader";
 
 const PlaceOrderScreen = () => {
-  const cart  = useSelector((state) => state.cart);
+  const cart = useSelector((state) => state.cart);
 
-  let isLoading = false
-  let error = null
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const placeOrderHandler = async()=>{
+  const [createOrder, { isLoading, error }] = useCreateOrderMutation();
+  const [orderToPaid] = usePayOrderMutation();
 
-  }
+  const placeOrderHandler = () => {
+    var options = {
+      key: "rzp_test_x6b41FJRXFLvmM",
+      key_secret: "98Y7mFd5GcpuJPIkjB0DaqIh",
+      amount: parseInt(cart.totalPrice * 100),
+      currency: "INR",
+      name: "MUHAMMAD BILAL",
+      description: "Ecommers Transaction",
+      handler: async function (response) {
+        const pay = response.razorpay_payment_id;
+        try {
+          const res = await createOrder({
+            cartItems: cart.cartItems,
+            shippingAddress: cart.shippingAddress,
+            paymentMethod: cart.paymentMethod,
+            paymentResult: pay,
+            itemPrice: cart.itemsPrice,
+            taxPrice: cart.taxPrice,
+            shippingPrice: cart.shippingPrice,
+            totalPrice: cart.totalPrice,
+          }).unwrap();
+
+          dispatch(clearCartItems());
+          await orderToPaid(res._id);
+          navigate(`/order/${res._id}`);
+        } catch (error) {
+          console.log(error?.message || error?.data?.message);
+        }
+      },
+      theme: {
+        color: "#3399cc",
+      },
+    };
+
+    var pay = new window.Razorpay(options);
+    pay.open();
+  };
 
   return (
     <>
